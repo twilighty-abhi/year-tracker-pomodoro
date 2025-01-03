@@ -205,8 +205,11 @@
 <div class="footer">
     Made With love and happiness :) <a href="https://abhiramnj.com" target="_blank">Abhi</a> ❤️
 </div>
-
 <script>
+    let timerInterval; // To hold the timer interval
+    let remainingTime; // Remaining time in seconds
+    let isPaused = false; // Flag to check if the timer is paused
+
     function updateYearProgress() {
         const now = new Date();
         const startOfYear = new Date(now.getFullYear(), 0, 1);
@@ -230,7 +233,76 @@
         btn.textContent = newTheme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme";
     }
 
+    function updateTimerDisplay() {
+        const minutes = Math.floor(remainingTime / 60);
+        const seconds = remainingTime % 60;
+        document.getElementById('timerRemaining').textContent =
+            `Time Remaining: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function startTimer() {
+        remainingTime = 25 * 60; // 25 minutes in seconds
+        isPaused = false;
+
+        // Show Pause and Stop buttons
+        document.getElementById('timerControls').innerHTML = `
+            <button class="timer-button" id="pauseTimer">Pause Timer</button>
+            <button class="timer-button" id="stopTimer">Stop Timer</button>
+        `;
+
+        // Attach event listeners
+        document.getElementById('pauseTimer').addEventListener('click', togglePause);
+        document.getElementById('stopTimer').addEventListener('click', stopTimer);
+
+        // Start the countdown
+        startCountdown();
+    }
+
+    function startCountdown() {
+        if (timerInterval) clearInterval(timerInterval); // Clear any existing timer
+
+        timerInterval = setInterval(() => {
+            if (!isPaused) {
+                if (remainingTime <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timerRemaining').textContent = "Time's up!";
+                    playChime(); // Play chime sound
+                } else {
+                    remainingTime--;
+                    updateTimerDisplay();
+                }
+            }
+        }, 1000);
+
+        updateTimerDisplay();
+    }
+
+    function togglePause() {
+        isPaused = !isPaused;
+        document.getElementById('pauseTimer').textContent = isPaused ? "Resume Timer" : "Pause Timer";
+    }
+
+    function stopTimer() {
+        clearInterval(timerInterval);
+        remainingTime = 0;
+        document.getElementById('timerRemaining').textContent = "Timer Stopped.";
+        resetTimerButtons();
+    }
+
+    function resetTimerButtons() {
+        document.getElementById('timerControls').innerHTML = `
+            <button class="timer-button" id="startTimer">Start 25-Minute Timer</button>
+        `;
+        document.getElementById('startTimer').addEventListener('click', startTimer);
+    }
+
+    function playChime() {
+        const chime = new Audio("https://www.soundjay.com/button/sounds/beep-07.mp3");
+        chime.play();
+    }
+
     document.getElementById("themeSwitcher").addEventListener("click", toggleTheme);
+    document.getElementById("startTimer").addEventListener("click", startTimer);
 
     // Initialize with system theme and prevent flashing white
     const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -243,5 +315,7 @@
     updateYearProgress();
     setInterval(updateYearProgress, 1000);
 </script>
+
+
 </body>
 </html>
