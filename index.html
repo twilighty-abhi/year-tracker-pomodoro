@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Year Progress Tracker</title>
+    <style>
+        :root {
+            --background-light: linear-gradient(to bottom, #4facfe, #00f2fe);
+            --background-dark: #121212;
+            --text-light: white;
+            --text-dark: #cfcfcf;
+            --progress-light: #ffaf00;
+            --progress-dark: #ffaf00;
+            --inactive-light: rgba(255, 255, 255, 0.2);
+            --inactive-dark: rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --background-light: var(--background-dark);
+            --text-light: var(--text-dark);
+            --progress-light: var(--progress-dark);
+            --inactive-light: var(--inactive-dark);
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: var(--background-light);
+            color: var(--text-light);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Ensures vertical centering */
+            align-items: center; /* Ensures horizontal centering */
+            transition: background-color 2s ease, color 2s ease;
+        }
+
+        .content {
+            text-align: center;
+            flex-grow: 1; /* Allows content to occupy the main area */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            transition: color 2s ease;
+        }
+
+        .date-time {
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+            transition: color 2s ease;
+        }
+
+        .progress-bar-container {
+            width: 90%;
+            max-width: 400px;
+            background-color: var(--inactive-light);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 2s ease;
+        }
+
+        .progress-bar {
+            height: 20px;
+            width: 0;
+            background-color: var(--progress-light);
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            font-size: 1rem;
+            margin-top: 0.5rem;
+            transition: color 2s ease;
+        }
+
+        .theme-switcher {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 0.5rem 1rem;
+            background: var(--inactive-light);
+            color: var(--text-light);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-switcher:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-switcher:active {
+            transform: scale(1);
+        }
+
+        .timer-button {
+            position: relative;
+            padding: 0.5rem 1rem;
+            background: var(--inactive-light);
+            color: var(--text-light);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .timer-button:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .timer-button:active {
+            transform: scale(1);
+        }
+
+        .timer-remaining {
+            font-size: 1rem;
+            margin-top: 0.5rem;
+            transition: color 2s ease;
+        }
+
+        .footer {
+            margin-top: auto;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            text-align: center;
+            margin-bottom: 1rem;
+            transition: color 2s ease;
+        }
+
+        .footer a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .date-time {
+                font-size: 0.9rem;
+            }
+
+            .progress-text, .timer-remaining, .footer {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.2rem;
+            }
+
+            .date-time {
+                font-size: 0.8rem;
+            }
+
+            .progress-bar-container {
+                width: 95%;
+            }
+
+            .progress-text, .timer-remaining, .footer {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="content">
+    <h1>Year Progress Tracker</h1>
+    <button class="theme-switcher" id="themeSwitcher">Switch Theme</button>
+    <div class="date-time" id="dateTime"></div>
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="progress-text" id="progressText"></div>
+
+    <div class="timer-controls" id="timerControls">
+        <button class="timer-button" id="startTimer">Start 25-Minute Timer</button>
+    </div>
+    <div class="timer-remaining" id="timerRemaining"></div>
+</div>
+
+<div class="footer">
+    Made With love and happiness :) <a href="https://abhiramnj.com" target="_blank">Abhi</a> ❤️
+</div>
+
+<script>
+    function updateYearProgress() {
+        const now = new Date();
+        const startOfYear = new Date(now.getFullYear(), 0, 1);
+        const endOfYear = new Date(now.getFullYear() + 1, 0, 1);
+        const yearProgress = ((now - startOfYear) / (endOfYear - startOfYear)) * 100;
+
+        document.getElementById('dateTime').textContent =
+            `Current Date & Time: ${now.toLocaleString()}`;
+        document.getElementById('progressBar').style.width = `${yearProgress}%`;
+        document.getElementById('progressText').textContent =
+            `${yearProgress.toFixed(3)}% of the year has passed`;
+    }
+
+    function toggleTheme() {
+        const body = document.body;
+        const currentTheme = body.getAttribute("data-theme");
+        const newTheme = currentTheme === "dark" ? "light" : "dark";
+        body.setAttribute("data-theme", newTheme);
+
+        const btn = document.getElementById("themeSwitcher");
+        btn.textContent = newTheme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme";
+    }
+
+    document.getElementById("themeSwitcher").addEventListener("click", toggleTheme);
+
+    // Initialize with system theme and prevent flashing white
+    const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const initialTheme = prefersDarkMode ? "dark" : "light";
+    document.body.setAttribute("data-theme", initialTheme);
+
+    document.getElementById("themeSwitcher").textContent =
+        prefersDarkMode ? "Switch to Light Theme" : "Switch to Dark Theme";
+
+    updateYearProgress();
+    setInterval(updateYearProgress, 1000);
+</script>
+</body>
+</html>
